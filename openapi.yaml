@@ -1,0 +1,100 @@
+openapi: 3.0.0
+info:
+  title: Shop API
+  description: Description of public Shop API
+  version: 1.0.0
+
+servers:
+  - url: https://76ileefpw2.execute-api.eu-west-1.amazonaws.com/dev/
+    description: Development server
+
+paths:
+  /products:
+    get:
+      summary: Returns a list of products
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /products/{id}:
+    get:
+      summary: Returns a product by product id
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: The product id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+                
+        '404':
+          description: The product with the passed product id is not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '500':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+components:
+    schemas:
+      Product:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+          title:
+            type: string
+          description:
+            type: string
+          price:
+            type: number
+            minimum: 0.01
+          count:
+            type: integer
+            minimum: 0
+        required:
+          - id
+          - title
+          - description
+          - price
+          - count
+
+      NotFoundError:
+        type: object
+        properties:
+          error:
+            type: string
+
+      InternalServerError:
+        type: object
+        properties:
+          error:
+            type: string
+          details:
+            type: string

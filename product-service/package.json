@@ -1,0 +1,25 @@
+{
+  "name": "aws-be",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.12.3",
+    "@babel/preset-env": "^7.12.1",
+    "babel-loader": "^8.1.0",
+    "babel-preset-es2015": "^6.24.1",
+    "serverless-plugin-webpack": "^1.5.1",
+    "webpack": "^5.3.1"
+  },
+  "dependencies": {
+    "@middy/core": "^1.4.0",
+    "@middy/http-cors": "^1.4.0",
+    "middy-autoproxyresponse": "^0.1.0",
+    "uuid": "^8.3.1"
+  }
+}
