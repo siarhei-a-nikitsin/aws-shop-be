@@ -11,6 +11,9 @@ servers:
 paths:
   /products:
     get:
+      tags: [
+        Products
+      ]
       summary: Returns a list of products
       responses:
         '200':
@@ -30,6 +33,9 @@ paths:
 
   /products/{id}:
     get:
+      tags: [
+        Products
+      ]
       summary: Returns a product by product id
       parameters:
         - in: path
