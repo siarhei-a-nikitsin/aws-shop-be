@@ -5,7 +5,7 @@ import { autoProxyResponse } from 'middy-autoproxyresponse';
 import productService from '../services/productService';
 import create500Response from '../common/responses/create500Response';
 
-const handler = async () => {
+export const handler = async () => {
   try {
     const products = await productService.getProducts();
 

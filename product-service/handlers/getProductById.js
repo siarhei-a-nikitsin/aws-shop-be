@@ -7,7 +7,7 @@ import NotFoundError from '../common/errors/notFoundError';
 import create404Response from '../common/responses/create404Response';
 import create500Response from '../common/responses/create500Response';
 
-const handler = async (event) => {
+export const handler = async (event) => {
   try {
     const {
       pathParameters: { id: productId },
