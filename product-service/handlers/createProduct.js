@@ -1,26 +1,32 @@
 import middy from "@middy/core";
 import cors from "@middy/http-cors";
-import httpHeaderNormalizer from "@middy/http-header-normalizer";
 import inputOutputLogger from "@middy/input-output-logger";
+import httpHeaderNormalizer from "@middy/http-header-normalizer";
 import createError from "http-errors";
 
 import { createHttpErrorHandler } from "../middlewares/createHttpErrorHandler";
 import successfulResponseHandler from "../middlewares/successfulResponseHandler";
-import productService from "../services/productService";
+import { createProduct } from "../services/productService";
 
-export const handler = async (event) => {
-  const {
-    pathParameters: { id: productId },
-  } = event;
-  const product = await productService.getProductById(productId);
+const handler = async (event) => {
+  try {
+    const newProduct = JSON.parse(event.body);
 
-  if (!product) {
-    throw new createError.NotFound(
-      `The following product (id: ${productId}) is not found.`
-    );
+    const id = await createProduct(newProduct);
+
+    return {
+      statusCode: 201,
+      body: {
+        id,
+      },
+    };
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      throw new createError.BadRequest(error?.message);
+    }
+
+    throw error;
   }
-
-  return product;
 };
 
 export default middy(handler)

@@ -1,14 +1,17 @@
 service: product-service
 frameworkVersion: '3'
 
+useDotenv: true
+
 provider:
   name: aws
-  runtime: nodejs12.x
-  region: eu-west-1
+  runtime: nodejs16.x
+  region: ${env:REGION}
   stage: dev
 
 plugins:
   - serverless-plugin-webpack
+  - serverless-dotenv-plugin
 
 functions:
   getProductsList:
@@ -29,3 +32,10 @@ functions:
               paths:
                 id: true
           cors: true
+  createProduct:
+    handler: handler.createProduct
+    events:
+        - http:
+            path: products
+            method: post
+            cors: true
