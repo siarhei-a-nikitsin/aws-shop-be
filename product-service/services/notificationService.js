@@ -1,5 +1,7 @@
 import { SNS } from "aws-sdk";
 
+const CHEAP_PRODUCT_THRESHOLD_PRICE = 200;
+
 export const sendNewProductsNotification = async (newProducts) => {
   const sns = new SNS({ region: process.env.REGION });
 
@@ -7,7 +9,7 @@ export const sendNewProductsNotification = async (newProducts) => {
   const nonExpensiveNewProducts = [];
 
   newProducts.forEach((product) => {
-    if (product.price >= 100) {
+    if (product.price >= CHEAP_PRODUCT_THRESHOLD_PRICE) {
       expensiveNewProducts.push(product);
     } else {
       nonExpensiveNewProducts.push(product);
@@ -38,8 +40,12 @@ export const sendNewProductsNotification = async (newProducts) => {
     }
   };
 
+  const promises = [];
+
   expensiveNewProducts.length > 0 &&
-    (await sendNotification(expensiveNewProducts, true));
+    promises.push(sendNotification(expensiveNewProducts, true));
   nonExpensiveNewProducts.length > 0 &&
-    (await sendNotification(nonExpensiveNewProducts, false));
+    promises.push(sendNotification(nonExpensiveNewProducts, false));
+
+  await Promise.all(promises);
 };

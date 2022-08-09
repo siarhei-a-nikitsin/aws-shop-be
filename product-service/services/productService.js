@@ -1,4 +1,5 @@
 import Joi from "joi";
+import format from "pg-format";
 
 import { createClient } from "./dal/client";
 
@@ -96,6 +97,7 @@ export const createProduct = async (data) => {
 export const createProducts = async (products) => {
   products.forEach((product) => {
     const { error } = newProductSchema.validate(product);
+
     if (error) {
       throw error;
     }

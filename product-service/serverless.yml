@@ -9,6 +9,10 @@ provider:
   region: ${env:REGION}
   stage: dev
 
+  environment:
+    SNS_ARN:
+      Ref: SNSTopic
+
   iamRoleStatements:
     - Effect: "Allow"
       Action: "sqs:*"
