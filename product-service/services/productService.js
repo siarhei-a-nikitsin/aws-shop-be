@@ -1,4 +1,5 @@
 import Joi from "joi";
+import format from "pg-format";
 
 import { createClient } from "./dal/client";
 
@@ -87,6 +88,55 @@ export const createProduct = async (data) => {
   } catch (error) {
     await client.query("ROLLBACK");
 
+    throw error;
+  } finally {
+    await client.end();
+  }
+};
+
+export const createProducts = async (products) => {
+  products.forEach((product) => {
+    const { error } = newProductSchema.validate(product);
+
+    if (error) {
+      throw error;
+    }
+  });
+
+  const client = createClient();
+  await client.connect();
+
+  try {
+    client.query("BEGIN");
+
+    const formattedProducts = products.map(({ title, description, price }) => [
+      title,
+      description,
+      price,
+    ]);
+
+    const createProductsQuery = format(
+      "insert into products (title, description, price) values %L returning id",
+      formattedProducts
+    );
+    const { rows } = await client.query(createProductsQuery);
+    const newProductIds = rows.map(({ id }) => id);
+
+    const formattedCount = products.map(({ count }, index) => [
+      newProductIds[index],
+      count,
+    ]);
+    const createProductStock = format(
+      "insert into stocks (product_id, count) values %L",
+      formattedCount
+    );
+    await client.query(createProductStock);
+
+    await client.query("COMMIT");
+
+    return newProductIds;
+  } catch (error) {
+    await client.query("ROLLBACK");
     throw error;
   } finally {
     await client.end();

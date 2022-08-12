@@ -31,3 +31,4 @@ test("returns 500 response", async () => {
 
   expect(expected500ErrorResponse).toEqual(actualResponse);
 });
+ 

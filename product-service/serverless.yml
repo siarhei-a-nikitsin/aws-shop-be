@@ -9,6 +9,47 @@ provider:
   region: ${env:REGION}
   stage: dev
 
+  environment:
+    SNS_ARN:
+      Ref: SNSTopic
+
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action: "sqs:*"
+      Resource:
+        - "${cf:import-service-${env:STAGE}.NewProductSQSQueueArn}"
+    - Effect: "Allow"
+      Action: "sns:*"
+      Resource:
+        Ref: SNSTopic
+
+resources:
+  Resources:
+    SNSTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: createProductTopic
+    SNSSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: ${env:SNS_SUBSCRIPTION_EMAIL}
+        Protocol: email
+        TopicArn:
+          Ref: SNSTopic
+        FilterPolicy:
+          IsExpensive:
+            - "false"
+    SNSSubscription1:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: ${env:SNS_SUBSCRIPTION_EMAIL_FOR_EXPENSIVE_PRODUCTS}
+        Protocol: email
+        TopicArn:
+          Ref: SNSTopic
+        FilterPolicy:
+          IsExpensive:
+            - "true"
+
 plugins:
   - serverless-plugin-webpack
   - serverless-dotenv-plugin
@@ -39,3 +80,10 @@ functions:
             path: products
             method: post
             cors: true
+  catalogBatchProcess:
+    handler: handler.catalogBatchProcess
+    events:
+      - sqs:
+          batchSize: 5
+          arn:
+            - "${cf:import-service-${env:STAGE}.NewProductSQSQueueArn}"

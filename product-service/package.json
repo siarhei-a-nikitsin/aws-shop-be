@@ -34,9 +34,11 @@
     "@middy/input-output-logger": "^3.1.0",
     "@middy/util": "^3.1.0",
     "@types/jest": "^28.1.6",
+    "aws-sdk": "^2.1189.0",
     "eslint-plugin-jest": "^26.6.0",
     "http-errors": "^2.0.0",
     "joi": "^17.6.0",
-    "pg": "^8.7.3"
+    "pg": "^8.7.3",
+    "pg-format": "^1.0.4"
   }
 }

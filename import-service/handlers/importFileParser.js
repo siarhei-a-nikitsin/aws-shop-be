@@ -6,10 +6,12 @@ import csv from "csv-parser";
 import { createHttpErrorHandler } from "../middlewares/createHttpErrorHandler";
 import successfulResponseHandler from "../middlewares/successfulResponseHandler";
 import { getS3 } from "../utils/s3Factory";
+import sqsFactory from "../utils/sqsFactory";
 import { BUCKET, UPLOADED_FOLDER, PARSED_FOLDER } from "../constants";
 
 const handler = async (event) => {
   const s3 = getS3();
+  const sqs = sqsFactory.getSQS();
 
   const promises = event.Records.map((record) => {
     const fileKey = record.s3.object.key;
@@ -26,6 +28,22 @@ const handler = async (event) => {
         .pipe(csv())
         .on("data", (newProduct) => {
           console.log("Parse new product: ", newProduct);
+          console.log(
+            "process.env.SQS_NEW_PRODUCT_URL = ",
+            process.env.SQS_NEW_PRODUCT_URL
+          );
+          sqs.sendMessage(
+            {
+              QueueUrl: process.env.SQS_NEW_PRODUCT_URL,
+              MessageBody: JSON.stringify(newProduct),
+            },
+            (error, data) => {
+              console.log("Error = ", error);
+              console.log("Data = ", data);
+
+              console.log("Send message for new product: ", newProduct);
+            }
+          );
         })
         .on("end", async () => {
           console.log("End file reading.");
