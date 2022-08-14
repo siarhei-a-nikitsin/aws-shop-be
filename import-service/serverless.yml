@@ -55,6 +55,12 @@ functions:
               querystrings:
                 name: true
           cors: true
+          authorizer:
+            name: basicAuthorizer
+            arn: "arn:aws:lambda:${env:REGION}:${env:ACCOUNT_ID}:function:authorization-service-dev-basicAuthorizer"
+            resultTtlInSeconds: 0
+            identitySource: method.request.header.Authorization
+            type: token
 
   importFileParser:
     handler: handler.importFileParser
