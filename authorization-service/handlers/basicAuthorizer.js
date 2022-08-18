@@ -40,18 +40,22 @@ const handler = async (event, _, cb) => {
 
         const buffer = Buffer.from(encodedCredentials, "base64");
         const [login, password] = buffer.toString("utf-8").split(":");
-        
-        userName = login;
 
         console.log(
-          `username: ${userName} and password: ${password}, buffer = ${buffer.toString(
+          `username: ${login} and password: ${password}, buffer = ${buffer.toString(
             "utf-8"
           )}`
         );
 
-        const expectedUserPassword = process.env[userName];
+        userName = login;
 
-        isAllowed = expectedUserPassword === password;
+        if(process.env[userName]) {
+          const expectedUserPassword = process.env[userName];
+
+          isAllowed = expectedUserPassword === password;
+        } else {
+          isAllowed = false;
+        }
       } catch (e) {
         isAllowed = false;
       }
