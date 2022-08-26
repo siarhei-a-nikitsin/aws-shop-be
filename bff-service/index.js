@@ -1,11 +1,16 @@
 const express = require("express");
 require("dotenv").config();
 const axios = require("axios").default;
+const NodeCache = require("node-cache");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
+
+const productsCache = new NodeCache({ stdTTL: 120 });
+const PRODUCTS_KEY = "products";
+
 
 app.all("/*", (req, res) => {
   console.log("originalUrl = ", req.originalUrl);
@@ -19,6 +24,14 @@ app.all("/*", (req, res) => {
   console.log("recipientURL = ", recipientURL);
 
   if (recipientURL) {
+    const isGetProductsList = req.originalUrl === "/products" && req.method === "GET";
+    
+    if(productsCache.has(PRODUCTS_KEY)) {
+      console.log("get products from cache = ", productsCache.get(PRODUCTS_KEY));
+      res.json(productsCache.get(PRODUCTS_KEY));
+      return;
+    }
+
     const axiosConfig = {
       method: req.method,
       url: `${recipientURL}${req.originalUrl}`,
@@ -30,6 +43,12 @@ app.all("/*", (req, res) => {
     axios(axiosConfig)
       .then(({ data }) => {
         console.log("response from recipient = ", data);
+
+        if(isGetProductsList) {
+          console.log("set products to cache = ", data);
+          productsCache.set(PRODUCTS_KEY, data);
+        }
+
         res.json(data);
       })
       .catch((error) => {
