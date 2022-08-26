@@ -1,0 +1,22 @@
+{
+  "name": "bff-service",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node index.js",
+    "eb-init": "eb init siarhei-a-nikitsin-bff-api  --platform node.js -r eu-west-1 --profile rs-user",
+    "eb-create": "eb create production --single --cname siarhei-a-nikitsin-bff-api-prod -r eu-west-1 --profile rs-user",
+    "eb:deploy": "eb deploy",
+    "eb-terminate": "eb terminate"
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "dotenv": "^16.0.1",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "morgan": "~1.9.1"
+  }
+}
